@@ -10,45 +10,45 @@ type AnchorPositions = Record<string, number>
  * Hook that tracks the vertical positions of comment anchors in a Tiptap editor
  * 
  * @param editor - The Tiptap editor instance
- * @param deps - Additional dependencies that should trigger position recalculation
+ * @param scrollRef - Reference to the scrollable container element
  * @returns An object mapping comment IDs to their vertical positions
  */
 export function useAnchors(
   editor: Editor | null,
-  deps: unknown[] = [],
+  scrollRef: React.RefObject<HTMLDivElement>,
 ): AnchorPositions {
   // Store positions of all comment anchors
   const [positions, setPositions] = useState<AnchorPositions>({})
 
   useEffect(() => {
-    // Don't do anything if editor isn't initialized
-    if (!editor) return
+    // Don't do anything if editor or scroll container isn't initialized
+    if (!editor || !scrollRef.current) return
   
-    // Get the root DOM element of the editor
+    // Get the root DOM element of the editor and scroll container
     const root = editor.view.dom as HTMLElement
+    const scroll = scrollRef.current
   
     /**
      * Updates the positions of all comment anchors
      * This needs to run whenever the document layout changes
      */
     const update = () => {
-      console.log('Updating comment anchor positions...')
       const map: Record<string, number> = {}
       // Find all elements with data-comment-id attribute
       const elements = root.querySelectorAll<HTMLElement>("[data-comment-id]")
-      console.log(`Found ${elements.length} comment anchors`)
+      
+      // Get the container's position relative to viewport
+      const contRect = scroll.getBoundingClientRect()
       
       elements.forEach((el) => {
         const id = el.dataset.commentId
         if (id) {
-          // Calculate absolute position by adding scroll offset to element's top position
-          const position = el.getBoundingClientRect().top + window.scrollY
-          map[id] = position
-          console.log(`Anchor ${id} position: ${position}px`)
+          // Calculate position relative to the scroll container
+          const elRect = el.getBoundingClientRect()
+          map[id] = elRect.top - contRect.top + scroll.scrollTop
         }
       })
       
-      console.log('New positions:', map)
       setPositions(map)
     }
   
@@ -60,21 +60,20 @@ export function useAnchors(
     ro.observe(root)
   
     // Update positions when editor content changes
-    editor.on("transaction", update)     // 🔗 add listener
+    editor.on("transaction", update)
   
-    // Update positions when page is scrolled
-    window.addEventListener("scroll", update, { passive: true })
+    // Update positions when container is scrolled
+    scroll.addEventListener("scroll", update, { passive: true })
   
     // Cleanup function to remove all listeners
     return () => {
       ro.disconnect()
-      editor.off("transaction", update)  // 🔗 remove listener
-      window.removeEventListener("scroll", update)
+      editor.off("transaction", update)
+      scroll.removeEventListener("scroll", update)
     }
-  }, [editor, ...deps])
+  }, [editor, scrollRef])
 
   return positions
 }
-
 
 export default useAnchors

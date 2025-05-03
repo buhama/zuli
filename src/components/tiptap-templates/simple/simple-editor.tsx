@@ -200,6 +200,7 @@ export function SimpleEditor() {
     height: 0,
   })
   const toolbarRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState<string | null>(null)
 
   useEffect(() => {
@@ -296,7 +297,7 @@ export function SimpleEditor() {
     }
   }, [isMobile, mobileView])
 
-  const pos = useAnchors(editor, [active])
+  const pos = useAnchors(editor, scrollRef as React.RefObject<HTMLDivElement>)
 
   return (
     <EditorContext.Provider value={{ editor }}>
@@ -324,27 +325,27 @@ export function SimpleEditor() {
         )}
       </Toolbar>
 
-      <div className="content-wrapper">
+      <div ref={scrollRef} className="content-wrapper px-20 relative flex justify-center gap-4 max-h-[90vh]">
         <EditorContent
           editor={editor}
           role="presentation"
-          className="simple-editor-content"
+          className="simple-editor-content w-full"
         />
-        <div className="w-[260px]">
-        {sampleComments.map((c) => (
-          <div
-            key={c.id}
-            onMouseEnter={() => setActive(c.id)}
-            onMouseLeave={() => setActive(null)}
-            className={`absolute transition-colors w-60 p-3 rounded-md shadow
-              bg-slate-100 dark:bg-slate-800
-              border ${active === c.id ? "border-blue-500" : "border-transparent"}`}
-            style={{ top: pos[c.id] ?? 0, right: 0 }}
-          >
-            {c.text}
-          </div>
-        ))}
-      </div>
+        <div className="relative w-[260px] shrink-0">
+          {sampleComments.map((c) => (
+            <div
+              key={c.id}
+              onMouseEnter={() => setActive(c.id)}
+              onMouseLeave={() => setActive(null)}
+              className={`absolute transition-colors w-60 p-3 rounded-md shadow
+                bg-slate-100 dark:bg-slate-800
+                border ${active === c.id ? "border-blue-500" : "border-transparent"}`}
+              style={{ top: pos[c.id] ?? 0, left: 0 }}
+            >
+              {c.text}
+            </div>
+          ))}
+        </div>
       </div>
     </EditorContext.Provider>
   )

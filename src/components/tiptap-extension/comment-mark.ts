@@ -16,7 +16,7 @@ export const CommentMark = Mark.create({
       "span",
       mergeAttributes(HTMLAttributes, {
         "data-comment-id": HTMLAttributes.id,
-        class: "inline bg-yellow-100 dark:bg-yellow-900",
+        // class: "inline bg-yellow-100 dark:bg-yellow-900",
       }),
       0,
     ]
