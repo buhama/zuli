@@ -7,6 +7,9 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { MoonStarIcon } from '@/app/components/tiptap-icons/moon-star-icon'
+import { SunIcon } from '@/app/components/tiptap-icons/sun-icon'
+import { useTheme } from 'next-themes'
 
 const formSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -14,6 +17,8 @@ const formSchema = z.object({
 })
 
 const Login = () => {
+  const { theme, setTheme } = useTheme()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,6 +35,21 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="flex w-full max-w-md shadow-2xl rounded-lg overflow-hidden">
         <div className="w-full max-w-md p-10 bg-card border border-border flex flex-col justify-center space-y-8">
+          <div className="absolute top-4 right-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? (
+                <MoonStarIcon className="h-5 w-5" />
+              ) : (
+                <SunIcon className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
+
           <div className="text-left">
             <h2 className="text-3xl font-bold text-foreground">Sign in</h2>
             <p className="mt-2 text-sm text-muted-foreground">
