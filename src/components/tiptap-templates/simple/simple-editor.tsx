@@ -201,6 +201,7 @@ export function SimpleEditor() {
   })
   const toolbarRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [active, setActive] = useState<string | null>(null)
 
   useEffect(() => {
@@ -338,8 +339,8 @@ export function SimpleEditor() {
               onMouseEnter={() => setActive(c.id)}
               onMouseLeave={() => setActive(null)}
               className={`absolute transition-colors w-60 p-3 rounded-md shadow
-                bg-slate-100 dark:bg-slate-800
-                border ${active === c.id ? "border-blue-500" : "border-transparent"}`}
+                bg-background 
+                border border-border`}
               style={{ top: pos[c.id] ?? 0, left: 0 }}
             >
               {c.text}
