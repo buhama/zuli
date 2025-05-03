@@ -7,8 +7,8 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { MoonStarIcon } from '@/app/components/tiptap-icons/moon-star-icon'
-import { SunIcon } from '@/app/components/tiptap-icons/sun-icon'
+import { MoonStarIcon } from '@/components/tiptap-icons/moon-star-icon'
+import { SunIcon } from '@/components/tiptap-icons/sun-icon'
 import { useTheme } from 'next-themes'
 
 const formSchema = z.object({
