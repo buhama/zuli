@@ -10,36 +10,44 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { MoonStarIcon } from '@/components/tiptap-icons/moon-star-icon'
 import { SunIcon } from '@/components/tiptap-icons/sun-icon'
 import { useTheme } from 'next-themes'
-import { login } from './action'
+import Link from 'next/link'
+import { signup } from '../login/action'
 
 const formSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 })
 
-const Login = () => {
+const Signup = () => {
   const { theme, setTheme } = useTheme()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { error } = await login(values.email, values.password)
+      const { error } = await signup(values.email, values.password)
 
       if (error) {
         throw new Error(error)
       }
+      
     } catch (error) {
       console.error(error)
     }
   }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="flex w-full max-w-md shadow-2xl rounded-lg overflow-hidden">
@@ -60,15 +68,29 @@ const Login = () => {
           </div>
 
           <div className="text-left">
-            <h2 className="text-3xl font-bold text-foreground">Sign in</h2>
+            <h2 className="text-3xl font-bold text-foreground">Create an account</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              New to Zuli?{' '}
-              <a href="/signup" className="text-primary hover:underline">Sign up for an account.</a>
+              Already have an account?{' '}
+              <Link href="/login" className="text-primary hover:underline">Sign in</Link>
             </p>
           </div>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground">Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="email"
@@ -97,13 +119,22 @@ const Login = () => {
                 )}
               />
 
-              <div className="flex justify-between items-center">
-                <div></div>
-                <a href="#" className="text-xs text-muted-foreground hover:underline">Forgot password?</a>
-              </div>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-muted-foreground">Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Confirm your password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <Button type="submit" className="w-full">
-                Sign in
+                Create account
               </Button>
             </form>
           </Form>
@@ -123,8 +154,8 @@ const Login = () => {
                 variant="outline"
                 className="w-full flex items-center justify-center gap-2"
                 onClick={() => {
-                  // Handle Google sign in
-                  console.log('Google sign in clicked')
+                  // Handle Google sign up
+                  console.log('Google sign up clicked')
                 }}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -145,7 +176,7 @@ const Login = () => {
                     fill="#EA4335"
                   />
                 </svg>
-                Sign in with Google
+                Sign up with Google
               </Button>
             </div>
           </div>
@@ -155,4 +186,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Signup 
