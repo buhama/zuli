@@ -27,6 +27,7 @@
         {
           "type": "text",
           "marks": [
+            { "type": "comment", "attrs": { "id": "c1" } },
             {
               "type": "italic"
             },
@@ -395,7 +396,10 @@
       "content": [
         {
           "type": "text",
-          "text": "Make it your own"
+          "text": "Make it your own",
+          "marks": [
+            { "type": "comment", "attrs": { "id": "c2" } }
+          ]
         }
       ]
     },

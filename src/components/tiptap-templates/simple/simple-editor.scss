@@ -72,3 +72,34 @@ body {
     padding: 1rem 1.5rem;
   }
 }
+
+.editor-with-comments {
+  display: flex;
+  gap: 1rem;
+}
+
+.simple-editor-content {
+  flex: 1 1 auto;
+  max-width: 700px;
+}
+
+.comments-pane {
+  width: 240px;
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comment-card {
+  padding: 0.5rem 0.75rem;
+  background: var(--tt-bg-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-card.active,
+.comment-anchor[data-comment-id]:hover {
+  outline: 2px solid var(--tt-highlight-blue);
+}
+

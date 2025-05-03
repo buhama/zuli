@@ -74,6 +74,15 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
+import { useEffect, useRef, useState } from "react"
+import { CommentMark } from "@/components/tiptap-extension/comment-mark"
+import useAnchors from "@/hooks/use-anchor"
+
+const sampleComments = [
+  { id: "c1", text: "Nice hook for newcomers." },
+  { id: "c2", text: "Maybe link directly to the CLI docs here?" },
+]
+
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -179,10 +188,10 @@ const MobileToolbarContent = ({
 export function SimpleEditor() {
   const isMobile = useMobile()
   const windowSize = useWindowSize()
-  const [mobileView, setMobileView] = React.useState<
+  const [mobileView, setMobileView] = useState<
     "main" | "highlighter" | "link"
   >("main")
-  const [rect, setRect] = React.useState<
+  const [rect, setRect] = useState<
     Pick<DOMRect, "x" | "y" | "width" | "height">
   >({
     x: 0,
@@ -190,9 +199,10 @@ export function SimpleEditor() {
     width: 0,
     height: 0,
   })
-  const toolbarRef = React.useRef<HTMLDivElement>(null)
+  const toolbarRef = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState<string | null>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const updateRect = () => {
       setRect(document.body.getBoundingClientRect())
     }
@@ -233,6 +243,7 @@ export function SimpleEditor() {
       Subscript,
 
       Selection,
+      CommentMark,
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
@@ -246,7 +257,7 @@ export function SimpleEditor() {
     content: content,
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkCursorVisibility = () => {
       if (!editor || !toolbarRef.current) return
 
@@ -279,11 +290,13 @@ export function SimpleEditor() {
     checkCursorVisibility()
   }, [editor, rect.height, windowSize.height])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isMobile && mobileView !== "main") {
       setMobileView("main")
     }
   }, [isMobile, mobileView])
+
+  const pos = useAnchors(editor, [active])
 
   return (
     <EditorContext.Provider value={{ editor }}>
@@ -317,6 +330,21 @@ export function SimpleEditor() {
           role="presentation"
           className="simple-editor-content"
         />
+        <div className="w-[260px]">
+        {sampleComments.map((c) => (
+          <div
+            key={c.id}
+            onMouseEnter={() => setActive(c.id)}
+            onMouseLeave={() => setActive(null)}
+            className={`absolute transition-colors w-60 p-3 rounded-md shadow
+              bg-slate-100 dark:bg-slate-800
+              border ${active === c.id ? "border-blue-500" : "border-transparent"}`}
+            style={{ top: pos[c.id] ?? 0, right: 0 }}
+          >
+            {c.text}
+          </div>
+        ))}
+      </div>
       </div>
     </EditorContext.Provider>
   )
