@@ -73,10 +73,11 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
-import content from "@/components/tiptap-templates/simple/data/content.json"
+// import content from "@/components/tiptap-templates/simple/data/content.json"
 import { useEffect, useRef, useState } from "react"
 import { CommentMark } from "@/components/tiptap-extension/comment-mark"
 import useAnchors from "@/hooks/use-anchor"
+import { Journal } from '@/models/Journal';
 
 const sampleComments = [
   { id: "c1", text: "Nice hook for newcomers." },
@@ -185,183 +186,194 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
-  const isMobile = useMobile()
-  const windowSize = useWindowSize()
-  const [mobileView, setMobileView] = useState<
-    "main" | "highlighter" | "link"
-  >("main")
-  const [rect, setRect] = useState<
-    Pick<DOMRect, "x" | "y" | "width" | "height">
-  >({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  })
-  const toolbarRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [active, setActive] = useState<string | null>(null)
+interface Props {
+	initialContent: Journal | null;
+}
 
-  useEffect(() => {
-    const updateRect = () => {
-      setRect(document.body.getBoundingClientRect())
-    }
+export const SimpleEditor: React.FC<Props> = ({ initialContent }) => {
+	const isMobile = useMobile();
+	const windowSize = useWindowSize();
+	const [mobileView, setMobileView] = useState<'main' | 'highlighter' | 'link'>(
+		'main'
+	);
+	const [rect, setRect] = useState<
+		Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>
+	>({
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+	});
+	const toolbarRef = useRef<HTMLDivElement>(null);
+	const scrollRef = useRef<HTMLDivElement>(null);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [active, setActive] = useState<string | null>(null);
 
-    updateRect()
+	useEffect(() => {
+		const updateRect = () => {
+			setRect(document.body.getBoundingClientRect());
+		};
 
-    const resizeObserver = new ResizeObserver(updateRect)
-    resizeObserver.observe(document.body)
+		updateRect();
 
-    window.addEventListener("scroll", updateRect)
+		const resizeObserver = new ResizeObserver(updateRect);
+		resizeObserver.observe(document.body);
 
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener("scroll", updateRect)
-    }
-  }, [])
+		window.addEventListener('scroll', updateRect);
 
-  const editor = useEditor({
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        autocomplete: "off",
-        autocorrect: "off",
-        autocapitalize: "off",
-        "aria-label": "Main content area, start typing to enter text.",
-      },
-    },
-    extensions: [
-      StarterKit,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Underline,
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      Highlight.configure({ multicolor: true }),
-      Image,
-      Typography,
-      Superscript,
-      Subscript,
+		return () => {
+			resizeObserver.disconnect();
+			window.removeEventListener('scroll', updateRect);
+		};
+	}, []);
 
-      Selection,
-      CommentMark,
-      ImageUploadNode.configure({
-        accept: "image/*",
-        maxSize: MAX_FILE_SIZE,
-        limit: 3,
-        upload: handleImageUpload,
-        onError: (error) => console.error("Upload failed:", error),
-      }),
-      TrailingNode,
-      Link.configure({ openOnClick: false }),
-    ],
-    content: content,
-  })
+	const editor = useEditor({
+		immediatelyRender: false,
+		editorProps: {
+			attributes: {
+				autocomplete: 'off',
+				autocorrect: 'off',
+				autocapitalize: 'off',
+				'aria-label': 'Main content area, start typing to enter text.',
+				placeholder: 'Start typing to enter text.',
+			},
+		},
+		extensions: [
+			StarterKit,
+			TextAlign.configure({ types: ['heading', 'paragraph'] }),
+			Underline,
+			TaskList,
+			TaskItem.configure({ nested: true }),
+			Highlight.configure({ multicolor: true }),
+			Image,
+			Typography,
+			Superscript,
+			Subscript,
 
-  useEffect(() => {
-    const checkCursorVisibility = () => {
-      if (!editor || !toolbarRef.current) return
+			Selection,
+			CommentMark,
+			ImageUploadNode.configure({
+				accept: 'image/*',
+				maxSize: MAX_FILE_SIZE,
+				limit: 3,
+				upload: handleImageUpload,
+				onError: (error) => console.error('Upload failed:', error),
+			}),
+			TrailingNode,
+			Link.configure({ openOnClick: false }),
+		],
+		content: initialContent?.content || {},
+	});
 
-      const { state, view } = editor
-      if (!view.hasFocus()) return
+	useEffect(() => {
+		const checkCursorVisibility = () => {
+			if (!editor || !toolbarRef.current) return;
 
-      const { from } = state.selection
-      const cursorCoords = view.coordsAtPos(from)
+			const { state, view } = editor;
+			if (!view.hasFocus()) return;
 
-      if (windowSize.height < rect.height) {
-        if (cursorCoords && toolbarRef.current) {
-          const toolbarHeight =
-            toolbarRef.current.getBoundingClientRect().height
-          const isEnoughSpace =
-            windowSize.height - cursorCoords.top - toolbarHeight > 0
+			const { from } = state.selection;
+			const cursorCoords = view.coordsAtPos(from);
 
-          // If not enough space, scroll until the cursor is the middle of the screen
-          if (!isEnoughSpace) {
-            const scrollY =
-              cursorCoords.top - windowSize.height / 2 + toolbarHeight
-            window.scrollTo({
-              top: scrollY,
-              behavior: "smooth",
-            })
-          }
-        }
-      }
-    }
+			if (windowSize.height < rect.height) {
+				if (cursorCoords && toolbarRef.current) {
+					const toolbarHeight =
+						toolbarRef.current.getBoundingClientRect().height;
+					const isEnoughSpace =
+						windowSize.height - cursorCoords.top - toolbarHeight > 0;
 
-    checkCursorVisibility()
-  }, [editor, rect.height, windowSize.height])
+					// If not enough space, scroll until the cursor is the middle of the screen
+					if (!isEnoughSpace) {
+						const scrollY =
+							cursorCoords.top - windowSize.height / 2 + toolbarHeight;
+						window.scrollTo({
+							top: scrollY,
+							behavior: 'smooth',
+						});
+					}
+				}
+			}
+		};
 
-  useEffect(() => {
-    if (!isMobile && mobileView !== "main") {
-      setMobileView("main")
-    }
-  }, [isMobile, mobileView])
+		checkCursorVisibility();
+	}, [editor, rect.height, windowSize.height]);
 
-  const pos = useAnchors(editor, scrollRef as React.RefObject<HTMLDivElement>)
+	useEffect(() => {
+		if (!isMobile && mobileView !== 'main') {
+			setMobileView('main');
+		}
+	}, [isMobile, mobileView]);
 
-  return (
-    <EditorContext.Provider value={{ editor }}>
-      <Toolbar
-        ref={toolbarRef}
-        style={
-          isMobile
-            ? {
-                bottom: `calc(100% - ${windowSize.height - rect.y}px)`,
-              }
-            : {}
-        }
-      >
-        {mobileView === "main" ? (
-          <MainToolbarContent
-            onHighlighterClick={() => setMobileView("highlighter")}
-            onLinkClick={() => setMobileView("link")}
-            isMobile={isMobile}
-          />
-        ) : (
-          <MobileToolbarContent
-            type={mobileView === "highlighter" ? "highlighter" : "link"}
-            onBack={() => setMobileView("main")}
-          />
-        )}
-      </Toolbar>
+	const pos = useAnchors(editor, scrollRef as React.RefObject<HTMLDivElement>);
 
-      <div ref={scrollRef} className="content-wrapper px-20 relative flex justify-center gap-4 max-h-[90vh]">
-        <div className="w-full simple-editor-content">
-          <div className="px-12 flex flex-col gap-2 pt-12 pb-6">
-            <div>
-              <p className="text-3xl font-bold">May 3, 2025</p>
-              <p className="text-sm text-muted-foreground">10:00 AM | 5°</p>
+	return (
+		<EditorContext.Provider value={{ editor }}>
+			<Toolbar
+				ref={toolbarRef}
+				style={
+					isMobile
+						? {
+								bottom: `calc(100% - ${windowSize.height - rect.y}px)`,
+						  }
+						: {}
+				}
+			>
+				{mobileView === 'main' ? (
+					<MainToolbarContent
+						onHighlighterClick={() => setMobileView('highlighter')}
+						onLinkClick={() => setMobileView('link')}
+						isMobile={isMobile}
+					/>
+				) : (
+					<MobileToolbarContent
+						type={mobileView === 'highlighter' ? 'highlighter' : 'link'}
+						onBack={() => setMobileView('main')}
+					/>
+				)}
+			</Toolbar>
 
-            </div>
-            <div className="border-b border-border w-full"></div>
-          </div>
-          <EditorContent
-            editor={editor}
-            role="presentation"
-            className="w-full"
-          />
-        </div>
-        <div className="relative w-[260px] shrink-0">
-          <div className="flex flex-col gap-2 pt-12 pb-6">
-            <p className="text-muted-foreground h-[56px] flex items-end">Actions</p>
-            <div className="border-b border-border w-full"></div>
-          </div> 
-          {sampleComments.map((c) => (
-            <div
-              key={c.id}
-              onMouseEnter={() => setActive(c.id)}
-              onMouseLeave={() => setActive(null)}
-              className={`absolute transition-colors w-60 p-3 rounded-md shadow
+			<div
+				ref={scrollRef}
+				className='content-wrapper px-20 relative flex justify-center gap-4 max-h-[90vh]'
+			>
+				<div className='w-full simple-editor-content'>
+					<div className='px-12 flex flex-col gap-2 pt-12 pb-6'>
+						<div>
+							<p className='text-3xl font-bold'>May 3, 2025</p>
+							<p className='text-sm text-muted-foreground'>10:00 AM | 5°</p>
+						</div>
+						<div className='border-b border-border w-full'></div>
+					</div>
+					<EditorContent
+						editor={editor}
+						role='presentation'
+						className='w-full'
+					/>
+				</div>
+				<div className='relative w-[260px] shrink-0'>
+					<div className='flex flex-col gap-2 pt-12 pb-6'>
+						<p className='text-muted-foreground h-[56px] flex items-end'>
+							Actions
+						</p>
+						<div className='border-b border-border w-full'></div>
+					</div>
+					{sampleComments.map((c) => (
+						<div
+							key={c.id}
+							onMouseEnter={() => setActive(c.id)}
+							onMouseLeave={() => setActive(null)}
+							className={`absolute transition-colors w-60 p-3 rounded-md shadow
                 bg-background 
                 border border-border`}
-              style={{ top: pos[c.id] ?? 0, left: 0 }}
-            >
-              {c.text}
-            </div>
-          ))}
-        </div>
-      </div>
-    </EditorContext.Provider>
-  )
-}
+							style={{ top: pos[c.id] ?? 0, left: 0 }}
+						>
+							{c.text}
+						</div>
+					))}
+				</div>
+			</div>
+		</EditorContext.Provider>
+	);
+};
+
+export default SimpleEditor;

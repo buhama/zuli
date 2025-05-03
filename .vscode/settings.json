@@ -1,0 +1,49 @@
+{
+	"[html]": {
+		"editor.defaultFormatter": "lonefy.vscode-JS-CSS-HTML-formatter"
+	},
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"editor.formatOnSave": true,
+	"prettier.jsxSingleQuote": true,
+	"prettier.singleQuote": true,
+	"prettier.useTabs": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"editor.linkedEditing": true,
+	"editor.bracketPairColorization.enabled": true,
+	"editor.guides.bracketPairs": "active",
+	"editor.inlineSuggest.enabled": true,
+	"css.validate": false,
+	"eslint.validate": [
+		"javascript",
+		"javascriptreact",
+		"html",
+		"typescriptreact"
+	],
+	"cSpell.words": [
+		"chakra",
+		"chartjs",
+		"checkin",
+		"Concordia",
+		"editorjs",
+		"eventid",
+		"fortawesome",
+		"hookform",
+		"ilike",
+		"middlewares",
+		"nprogress",
+		"Qrcode",
+		"roboto",
+		"rubydev",
+		"Simpli",
+		"supabase",
+		"tailwindcss",
+		"tanstack",
+		"tiptap",
+		"unsub",
+		"uuidv",
+		"zustand"
+	]
+}
