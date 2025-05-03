@@ -327,12 +327,26 @@ export function SimpleEditor() {
       </Toolbar>
 
       <div ref={scrollRef} className="content-wrapper px-20 relative flex justify-center gap-4 max-h-[90vh]">
-        <EditorContent
-          editor={editor}
-          role="presentation"
-          className="simple-editor-content w-full"
-        />
+        <div className="w-full simple-editor-content">
+          <div className="px-12 flex flex-col gap-2 pt-12 pb-6">
+            <div>
+              <p className="text-3xl font-bold">May 3, 2025</p>
+              <p className="text-sm text-muted-foreground">10:00 AM | 5°</p>
+
+            </div>
+            <div className="border-b border-border w-full"></div>
+          </div>
+          <EditorContent
+            editor={editor}
+            role="presentation"
+            className="w-full"
+          />
+        </div>
         <div className="relative w-[260px] shrink-0">
+          <div className="flex flex-col gap-2 pt-12 pb-6">
+            <p className="text-muted-foreground h-[56px] flex items-end">Actions</p>
+            <div className="border-b border-border w-full"></div>
+          </div> 
           {sampleComments.map((c) => (
             <div
               key={c.id}
