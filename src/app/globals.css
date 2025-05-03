@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import 'path-to/_variables.scss';
-@import 'path-to/_keyframes-animations.scss';
+@import "@/components/tiptap-ui-primitive/tooltip/tooltip.scss";
+@import "@/components/tiptap-ui-primitive/popover/popover.scss";
 
 :root {
   --background: #ffffff;
