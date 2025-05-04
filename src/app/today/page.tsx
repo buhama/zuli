@@ -27,7 +27,9 @@ const TodayPage = async () => {
 
 	const journal = journalData;
 
-	return <SimpleEditor initialContent={journal} />;
+	console.log('userData', userData);
+
+	return <SimpleEditor initialContent={journal} user_id={userData.user.id} />;
 };
 
 export default TodayPage;

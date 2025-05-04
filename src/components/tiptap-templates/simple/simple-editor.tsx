@@ -1,201 +1,214 @@
 "use client"
 
 import * as React from "react"
-import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
+import {
+	Content,
+	EditorContent,
+	EditorContext,
+	useEditor,
+} from '@tiptap/react';
 
 // --- Tiptap Core Extensions ---
-import { StarterKit } from "@tiptap/starter-kit"
-import { Image } from "@tiptap/extension-image"
-import { TaskItem } from "@tiptap/extension-task-item"
-import { TaskList } from "@tiptap/extension-task-list"
-import { TextAlign } from "@tiptap/extension-text-align"
-import { Typography } from "@tiptap/extension-typography"
-import { Highlight } from "@tiptap/extension-highlight"
-import { Subscript } from "@tiptap/extension-subscript"
-import { Superscript } from "@tiptap/extension-superscript"
-import { Underline } from "@tiptap/extension-underline"
+import { StarterKit } from '@tiptap/starter-kit';
+import { Image } from '@tiptap/extension-image';
+import { TaskItem } from '@tiptap/extension-task-item';
+import { TaskList } from '@tiptap/extension-task-list';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { Typography } from '@tiptap/extension-typography';
+import { Highlight } from '@tiptap/extension-highlight';
+import { Subscript } from '@tiptap/extension-subscript';
+import { Superscript } from '@tiptap/extension-superscript';
+import { Underline } from '@tiptap/extension-underline';
 
 // --- Custom Extensions ---
-import { Link } from "@/components/tiptap-extension/link-extension"
-import { Selection } from "@/components/tiptap-extension/selection-extension"
-import { TrailingNode } from "@/components/tiptap-extension/trailing-node-extension"
+import { Link } from '@/components/tiptap-extension/link-extension';
+import { Selection } from '@/components/tiptap-extension/selection-extension';
+import { TrailingNode } from '@/components/tiptap-extension/trailing-node-extension';
 
 // --- UI Primitives ---
-import { Button } from "@/components/tiptap-ui-primitive/button"
-import { Spacer } from "@/components/tiptap-ui-primitive/spacer"
+import { Button } from '@/components/tiptap-ui-primitive/button';
+import { Spacer } from '@/components/tiptap-ui-primitive/spacer';
 import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarSeparator,
-} from "@/components/tiptap-ui-primitive/toolbar"
+	Toolbar,
+	ToolbarGroup,
+	ToolbarSeparator,
+} from '@/components/tiptap-ui-primitive/toolbar';
 
 // --- Tiptap Node ---
-import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension"
-import "@/components/tiptap-node/code-block-node/code-block-node.scss"
-import "@/components/tiptap-node/list-node/list-node.scss"
-import "@/components/tiptap-node/image-node/image-node.scss"
-import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+import { ImageUploadNode } from '@/components/tiptap-node/image-upload-node/image-upload-node-extension';
+import '@/components/tiptap-node/code-block-node/code-block-node.scss';
+import '@/components/tiptap-node/list-node/list-node.scss';
+import '@/components/tiptap-node/image-node/image-node.scss';
+import '@/components/tiptap-node/paragraph-node/paragraph-node.scss';
 
 // --- Tiptap UI ---
-import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
-import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button"
-import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
-import { NodeButton } from "@/components/tiptap-ui/node-button"
+import { HeadingDropdownMenu } from '@/components/tiptap-ui/heading-dropdown-menu';
+import { ImageUploadButton } from '@/components/tiptap-ui/image-upload-button';
+import { ListDropdownMenu } from '@/components/tiptap-ui/list-dropdown-menu';
+import { NodeButton } from '@/components/tiptap-ui/node-button';
 import {
-  HighlightPopover,
-  HighlightContent,
-  HighlighterButton,
-} from "@/components/tiptap-ui/highlight-popover"
+	HighlightPopover,
+	HighlightContent,
+	HighlighterButton,
+} from '@/components/tiptap-ui/highlight-popover';
 import {
-  LinkPopover,
-  LinkContent,
-  LinkButton,
-} from "@/components/tiptap-ui/link-popover"
-import { MarkButton } from "@/components/tiptap-ui/mark-button"
-import { TextAlignButton } from "@/components/tiptap-ui/text-align-button"
-import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
+	LinkPopover,
+	LinkContent,
+	LinkButton,
+} from '@/components/tiptap-ui/link-popover';
+import { MarkButton } from '@/components/tiptap-ui/mark-button';
+import { TextAlignButton } from '@/components/tiptap-ui/text-align-button';
+import { UndoRedoButton } from '@/components/tiptap-ui/undo-redo-button';
 
 // --- Icons ---
-import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon"
-import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
-import { LinkIcon } from "@/components/tiptap-icons/link-icon"
+import { ArrowLeftIcon } from '@/components/tiptap-icons/arrow-left-icon';
+import { HighlighterIcon } from '@/components/tiptap-icons/highlighter-icon';
+import { LinkIcon } from '@/components/tiptap-icons/link-icon';
 
 // --- Hooks ---
-import { useMobile } from "@/hooks/use-mobile"
-import { useWindowSize } from "@/hooks/use-window-size"
+import { useMobile } from '@/hooks/use-mobile';
+import { useWindowSize } from '@/hooks/use-window-size';
 
 // --- Components ---
-import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
+import { ThemeToggle } from '@/components/tiptap-templates/simple/theme-toggle';
 
 // --- Lib ---
-import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
+import { handleImageUpload, MAX_FILE_SIZE } from '@/lib/tiptap-utils';
 
 // --- Styles ---
-import "@/components/tiptap-templates/simple/simple-editor.scss"
+import '@/components/tiptap-templates/simple/simple-editor.scss';
 
 // import content from "@/components/tiptap-templates/simple/data/content.json"
-import { useEffect, useRef, useState } from "react"
-import { CommentMark } from "@/components/tiptap-extension/comment-mark"
-import useAnchors from "@/hooks/use-anchor"
+import { useEffect, useRef, useState } from 'react';
+import { CommentMark } from '@/components/tiptap-extension/comment-mark';
+import useAnchors from '@/hooks/use-anchor';
 import { Journal } from '@/models/Journal';
+import { upsert_journal } from '@/lib/journal';
+import { getRandomId } from '@/lib/string';
+import { convertUnixToDate, DATE_FORMAT, getTodaysDate } from '@/lib/date/date';
 
 const sampleComments = [
-  { id: "c1", text: "Nice hook for newcomers." },
-  { id: "c2", text: "Maybe link directly to the CLI docs here?" },
-]
-
+	{ id: 'c1', text: 'Nice hook for newcomers.' },
+	{ id: 'c2', text: 'Maybe link directly to the CLI docs here?' },
+];
 
 const MainToolbarContent = ({
-  onHighlighterClick,
-  onLinkClick,
-  isMobile,
+	onHighlighterClick,
+	onLinkClick,
+	isMobile,
 }: {
-  onHighlighterClick: () => void
-  onLinkClick: () => void
-  isMobile: boolean
+	onHighlighterClick: () => void;
+	onLinkClick: () => void;
+	isMobile: boolean;
 }) => {
-  return (
-    <>
-      <Spacer />
+	return (
+		<>
+			<Spacer />
 
-      <ToolbarGroup>
-        <UndoRedoButton action="undo" />
-        <UndoRedoButton action="redo" />
-      </ToolbarGroup>
+			<ToolbarGroup>
+				<UndoRedoButton action='undo' />
+				<UndoRedoButton action='redo' />
+			</ToolbarGroup>
 
-      <ToolbarSeparator />
+			<ToolbarSeparator />
 
-      <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} />
-        <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} />
-        <NodeButton type="codeBlock" />
-        <NodeButton type="blockquote" />
-      </ToolbarGroup>
+			<ToolbarGroup>
+				<HeadingDropdownMenu levels={[1, 2, 3, 4]} />
+				<ListDropdownMenu types={['bulletList', 'orderedList', 'taskList']} />
+				<NodeButton type='codeBlock' />
+				<NodeButton type='blockquote' />
+			</ToolbarGroup>
 
-      <ToolbarSeparator />
+			<ToolbarSeparator />
 
-      <ToolbarGroup>
-        <MarkButton type="bold" />
-        <MarkButton type="italic" />
-        <MarkButton type="strike" />
-        <MarkButton type="code" />
-        <MarkButton type="underline" />
-        {!isMobile ? (
-          <HighlightPopover />
-        ) : (
-          <HighlighterButton onClick={onHighlighterClick} />
-        )}
-        {!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
-      </ToolbarGroup>
+			<ToolbarGroup>
+				<MarkButton type='bold' />
+				<MarkButton type='italic' />
+				<MarkButton type='strike' />
+				<MarkButton type='code' />
+				<MarkButton type='underline' />
+				{!isMobile ? (
+					<HighlightPopover />
+				) : (
+					<HighlighterButton onClick={onHighlighterClick} />
+				)}
+				{!isMobile ? <LinkPopover /> : <LinkButton onClick={onLinkClick} />}
+			</ToolbarGroup>
 
-      <ToolbarSeparator />
+			<ToolbarSeparator />
 
-      <ToolbarGroup>
-        <MarkButton type="superscript" />
-        <MarkButton type="subscript" />
-      </ToolbarGroup>
+			<ToolbarGroup>
+				<MarkButton type='superscript' />
+				<MarkButton type='subscript' />
+			</ToolbarGroup>
 
-      <ToolbarSeparator />
+			<ToolbarSeparator />
 
-      <ToolbarGroup>
-        <TextAlignButton align="left" />
-        <TextAlignButton align="center" />
-        <TextAlignButton align="right" />
-        <TextAlignButton align="justify" />
-      </ToolbarGroup>
+			<ToolbarGroup>
+				<TextAlignButton align='left' />
+				<TextAlignButton align='center' />
+				<TextAlignButton align='right' />
+				<TextAlignButton align='justify' />
+			</ToolbarGroup>
 
-      <ToolbarSeparator />
+			<ToolbarSeparator />
 
-      <ToolbarGroup>
-        <ImageUploadButton text="Add" />
-      </ToolbarGroup>
+			<ToolbarGroup>
+				<ImageUploadButton text='Add' />
+			</ToolbarGroup>
 
-      <Spacer />
+			<Spacer />
 
-      {isMobile && <ToolbarSeparator />}
+			{isMobile && <ToolbarSeparator />}
 
-      <ToolbarGroup>
-        <ThemeToggle />
-      </ToolbarGroup>
-    </>
-  )
-}
+			<ToolbarGroup>
+				<ThemeToggle />
+			</ToolbarGroup>
+		</>
+	);
+};
 
 const MobileToolbarContent = ({
-  type,
-  onBack,
+	type,
+	onBack,
 }: {
-  type: "highlighter" | "link"
-  onBack: () => void
+	type: 'highlighter' | 'link';
+	onBack: () => void;
 }) => (
-  <>
-    <ToolbarGroup>
-      <Button data-style="ghost" onClick={onBack}>
-        <ArrowLeftIcon className="tiptap-button-icon" />
-        {type === "highlighter" ? (
-          <HighlighterIcon className="tiptap-button-icon" />
-        ) : (
-          <LinkIcon className="tiptap-button-icon" />
-        )}
-      </Button>
-    </ToolbarGroup>
+	<>
+		<ToolbarGroup>
+			<Button data-style='ghost' onClick={onBack}>
+				<ArrowLeftIcon className='tiptap-button-icon' />
+				{type === 'highlighter' ? (
+					<HighlighterIcon className='tiptap-button-icon' />
+				) : (
+					<LinkIcon className='tiptap-button-icon' />
+				)}
+			</Button>
+		</ToolbarGroup>
 
-    <ToolbarSeparator />
+		<ToolbarSeparator />
 
-    {type === "highlighter" ? <HighlightContent /> : <LinkContent />}
-  </>
-)
+		{type === 'highlighter' ? <HighlightContent /> : <LinkContent />}
+	</>
+);
 
 interface Props {
 	initialContent: Journal | null;
+	user_id: string;
 }
 
-export const SimpleEditor: React.FC<Props> = ({ initialContent }) => {
+export const SimpleEditor: React.FC<Props> = ({ initialContent, user_id }) => {
 	const isMobile = useMobile();
 	const windowSize = useWindowSize();
 	const [mobileView, setMobileView] = useState<'main' | 'highlighter' | 'link'>(
 		'main'
 	);
+
+	const [currentJournal, setCurrentJournal] = useState<Journal | null>(
+		initialContent
+	);
+
 	const [rect, setRect] = useState<
 		Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>
 	>({
@@ -226,6 +239,30 @@ export const SimpleEditor: React.FC<Props> = ({ initialContent }) => {
 			window.removeEventListener('scroll', updateRect);
 		};
 	}, []);
+
+	const saveJournal = async (content: Content) => {
+		try {
+			const journal: Journal = {
+				id: currentJournal?.id || getRandomId(),
+				title: currentJournal?.title || '',
+				created_at: currentJournal?.created_at || getTodaysDate(),
+				updated_at: getTodaysDate(),
+				user_id,
+				content,
+				date:
+					currentJournal?.date ||
+					convertUnixToDate(getTodaysDate(), DATE_FORMAT.YYYY_MM_DD),
+			};
+
+			console.log('journal', journal);
+
+			setCurrentJournal(journal);
+
+			await upsert_journal(journal);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	const editor = useEditor({
 		immediatelyRender: false,
@@ -263,6 +300,13 @@ export const SimpleEditor: React.FC<Props> = ({ initialContent }) => {
 			Link.configure({ openOnClick: false }),
 		],
 		content: initialContent?.content || {},
+		onUpdate: ({ editor }) => {
+			const debounceTimer = setTimeout(() => {
+				saveJournal(editor.getJSON());
+			}, 5000);
+
+			return () => clearTimeout(debounceTimer);
+		},
 	});
 
 	useEffect(() => {
