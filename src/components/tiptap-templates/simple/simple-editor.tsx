@@ -86,6 +86,7 @@ import { Journal } from '@/models/Journal';
 import { upsert_journal } from '@/lib/journal';
 import { getRandomId } from '@/lib/string';
 import { getTodaysDate } from '@/lib/date/date';
+import { useChat } from '@ai-sdk/react';
 
 const sampleComments = [
 	{ id: 'c1', text: 'Nice hook for newcomers.' },
@@ -231,6 +232,11 @@ export const SimpleEditor: React.FC<Props> = ({
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [active, setActive] = useState<string | null>(null);
 
+	const { append, messages } = useChat({
+		api: '/api/action',
+		maxSteps: 2,
+	});
+
 	useEffect(() => {
 		const updateRect = () => {
 			setRect(document.body.getBoundingClientRect());
@@ -317,6 +323,11 @@ export const SimpleEditor: React.FC<Props> = ({
 			if ((content && Object.keys(content).length > 0) || currentJournal?.id) {
 				const debounceTimer = setTimeout(() => {
 					saveJournal(content);
+					console.log('time to append');
+					append({
+						role: 'user',
+						content: JSON.stringify(content),
+					});
 				}, 5000);
 
 				return () => clearTimeout(debounceTimer);
@@ -390,6 +401,9 @@ export const SimpleEditor: React.FC<Props> = ({
 					/>
 				)}
 			</Toolbar>
+			{messages.map((message, index) => (
+				<div key={index}>{message.content}</div>
+			))}
 			<div
 				ref={scrollRef}
 				className='content-wrapper px-20 relative flex justify-center gap-4 max-h-[90vh]'
