@@ -13,11 +13,13 @@ const TodayPage = async () => {
 		redirect('/login');
 	}
 
+	const date = new Date().toISOString().split('T')[0];
+
 	const { data: journalData, error: journalError } = await supabase
 		.from('journals')
 		.select('*')
 		.eq('user_id', userData.user.id)
-		.eq('date', new Date().toISOString().split('T')[0])
+		.eq('date', date)
 		.maybeSingle<Journal>();
 
 	if (journalError) {
@@ -27,9 +29,13 @@ const TodayPage = async () => {
 
 	const journal = journalData;
 
-	console.log('userData', userData);
-
-	return <SimpleEditor initialContent={journal} user_id={userData.user.id} />;
+	return (
+		<SimpleEditor
+			initialContent={journal}
+			user_id={userData.user.id}
+			currentDate={date}
+		/>
+	);
 };
 
 export default TodayPage;

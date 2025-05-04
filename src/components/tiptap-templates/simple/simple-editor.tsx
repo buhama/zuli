@@ -79,13 +79,13 @@ import { handleImageUpload, MAX_FILE_SIZE } from '@/lib/tiptap-utils';
 import '@/components/tiptap-templates/simple/simple-editor.scss';
 
 // import content from "@/components/tiptap-templates/simple/data/content.json"
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CommentMark } from '@/components/tiptap-extension/comment-mark';
 import useAnchors from '@/hooks/use-anchor';
 import { Journal } from '@/models/Journal';
 import { upsert_journal } from '@/lib/journal';
 import { getRandomId } from '@/lib/string';
-import { convertUnixToDate, DATE_FORMAT, getTodaysDate } from '@/lib/date/date';
+import { getTodaysDate } from '@/lib/date/date';
 
 const sampleComments = [
 	{ id: 'c1', text: 'Nice hook for newcomers.' },
@@ -196,9 +196,14 @@ const MobileToolbarContent = ({
 interface Props {
 	initialContent: Journal | null;
 	user_id: string;
+	currentDate: string;
 }
 
-export const SimpleEditor: React.FC<Props> = ({ initialContent, user_id }) => {
+export const SimpleEditor: React.FC<Props> = ({
+	initialContent,
+	user_id,
+	currentDate,
+}) => {
 	const isMobile = useMobile();
 	const windowSize = useWindowSize();
 	const [mobileView, setMobileView] = useState<'main' | 'highlighter' | 'link'>(
@@ -208,6 +213,10 @@ export const SimpleEditor: React.FC<Props> = ({ initialContent, user_id }) => {
 	const [currentJournal, setCurrentJournal] = useState<Journal | null>(
 		initialContent
 	);
+
+	const currentId = useMemo(() => {
+		return initialContent?.id || getRandomId();
+	}, [initialContent]);
 
 	const [rect, setRect] = useState<
 		Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>
@@ -242,22 +251,25 @@ export const SimpleEditor: React.FC<Props> = ({ initialContent, user_id }) => {
 
 	const saveJournal = async (content: Content) => {
 		try {
+			// Only save if we have actual content or if we're updating an existing journal
+			if (
+				(!content || Object.keys(content).length === 0) &&
+				!currentJournal?.id
+			) {
+				return;
+			}
+
 			const journal: Journal = {
-				id: currentJournal?.id || getRandomId(),
+				id: currentId,
 				title: currentJournal?.title || '',
 				created_at: currentJournal?.created_at || getTodaysDate(),
 				updated_at: getTodaysDate(),
 				user_id,
 				content,
-				date:
-					currentJournal?.date ||
-					convertUnixToDate(getTodaysDate(), DATE_FORMAT.YYYY_MM_DD),
+				date: currentDate,
 			};
 
-			console.log('journal', journal);
-
 			setCurrentJournal(journal);
-
 			await upsert_journal(journal);
 		} catch (error) {
 			console.error(error);
@@ -301,11 +313,14 @@ export const SimpleEditor: React.FC<Props> = ({ initialContent, user_id }) => {
 		],
 		content: initialContent?.content || {},
 		onUpdate: ({ editor }) => {
-			const debounceTimer = setTimeout(() => {
-				saveJournal(editor.getJSON());
-			}, 5000);
+			const content = editor.getJSON();
+			if ((content && Object.keys(content).length > 0) || currentJournal?.id) {
+				const debounceTimer = setTimeout(() => {
+					saveJournal(content);
+				}, 5000);
 
-			return () => clearTimeout(debounceTimer);
+				return () => clearTimeout(debounceTimer);
+			}
 		},
 	});
 
@@ -375,7 +390,6 @@ export const SimpleEditor: React.FC<Props> = ({ initialContent, user_id }) => {
 					/>
 				)}
 			</Toolbar>
-
 			<div
 				ref={scrollRef}
 				className='content-wrapper px-20 relative flex justify-center gap-4 max-h-[90vh]'
